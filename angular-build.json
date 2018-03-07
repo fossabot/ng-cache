@@ -1,0 +1,179 @@
+{
+  "$schema": "./node_modules/@bizappframework/angular-build/schemas/schema-draft-04.json#",
+  "libs": [
+    {
+      "name": "ng-cache",
+      "srcDir": "modules/ng-cache",
+      "outDir": "dist/packages/ng-cache",
+      "libraryName": "baf.ngCache",
+
+      "tsTranspilation": {
+        "tsconfig": "tsconfig-build.json",
+        "copyTemplateAndStyleUrls": false,
+        "inlineMetaDataResources": false
+      },
+      "externals": {
+        "@bizappframework/ng-logging": "baf.ngLogging"
+      },
+      "packageOptions": {
+        "packageJsonFile": "package.json"
+      },
+      "envOverrides": {
+        "prod": {
+          "clean": {
+            "beforeRun": {
+              "cleanOutDir": true
+            }
+          },
+          "copy": [
+            "../../LICENSE",
+            "README.md"
+          ],
+          "banner": "../banner.txt",
+          "bundles": [
+            {
+              "entry": "index.js",
+              "entryRoot": "tsOutDir",
+              "libraryTarget": "es",
+              "outDir": "bundles"
+            },
+            {
+              "entryRoot": "prevBundleOutDir",
+              "libraryTarget": "es",
+              "outDir": "bundles",
+              "transformScriptTargetOnly": true,
+              "scriptTarget": "es5"
+            },
+            {
+              "entryRoot": "prevBundleOutDir",
+              "libraryTarget": "umd",
+              "outDir": "bundles",
+              "namedExports": true
+            }
+          ],
+          "packageOptions": {
+            "packageJsonFile": "package.json",
+            "reExportTypingsAndMetaDataAs": "[packagename]"
+          }
+        }
+      }
+    },
+    {
+      "extends": "ng-cache",
+      "name": "ng-cache-ngrx-store",
+      "srcDir": "modules/ng-cache-ngrx-store",
+      "outDir": "dist/packages/ng-cache-ngrx-store",
+      "libraryName": "baf.ngCacheNgrxStore",
+      "externals": {
+        "@bizappframework/ng-cache": "baf.ngCache",
+        "@bizappframework/ng-logging": "baf.ngLogging",
+        "@ngrx/entity": "ngrx.entity",
+        "@ngrx/store": "ngrx.store",
+        "@ngrx/effects": "ngrx.effects"
+      }
+    }
+  ],
+  "apps": [
+    {
+      "name": "generate",
+      "platformTarget": "web",
+      "srcDir": "samples/ng-cache-aspnetcore-sample/ClientApp",
+      "outDir": "samples/ng-cache-aspnetcore-sample/ClientApp/generated",
+      "clean": {
+        "beforeRun": {
+          "cleanOutDir": true
+        }
+      },
+      "polyfills": [
+        "ie-polyfills.ts"
+      ],
+      "polyfillsChunkName": "ie-polyfills.min",
+      "bundlesHash": false,
+      "publicPath": "/",
+      "skip": true,
+      "envOverrides": {
+        "generate": {
+          "skip": false
+        }
+      }
+    },
+    {
+      "name": "browser-app",
+      "platformTarget": "web",
+      "srcDir": "samples/ng-cache-aspnetcore-sample/ClientApp",
+      "outDir": "samples/ng-cache-aspnetcore-sample/wwwroot",
+      "entry": "main.browser.ts",
+      "tsconfig": "tsconfig.browser.json",
+      "copy": [
+        "favicon.ico",
+        "generated/ie-polyfills.min.js"
+      ],
+      "polyfills": [
+        "core-js/es6/reflect",
+        "core-js/es7/reflect",
+        "polyfills.ts"
+      ],
+      "publicPath": "/",
+      "baseHref": "~/",
+      "htmlInject": {
+        "resourceHints": true,
+        "baseHrefOut": "../Views/Shared/_BaseHref.generated.cshtml",
+        "iconsOut": "../Views/Shared/_Favicons.generated.cshtml",
+        "resourceHintsOut": "../Views/Shared/_ResourceHints.generated.cshtml",
+        "runtimeInlineOut": "../Views/Shared/_Runtime.generated.cshtml",
+        "stylesOut": "../Views/Shared/_Styles.generated.cshtml",
+        "scriptsOut": "../Views/Shared/_Scripts.generated.cshtml",
+        "customAttributes": {
+          "asp-append-version": "true"
+        }
+      },
+      //"vendorChunk": true,
+      "environmentVariables": {
+        "aiInstrumentationKey": "process.env.NG_LOGGING_DEMO_APP_INSIGHTS_KEY"
+      },
+      "envOverrides": {
+        "analyze": {
+          "bundleAnalyzer": {
+            "openAnalyzer": true
+          },
+          // "stats": {
+          //   "modules": true,
+          //   "chunks": true,
+          //   "chunkModules": true,
+          //   "entrypoints": true,
+          //   "excludeModules": "node_modules"
+          // },
+          "concatenateModules": false
+        },
+        "prod": {
+          "clean": {
+            "beforeRun": {
+              "cleanOutDir": true,
+              "paths": [
+                "../ClientApp/.bo-cache/"
+              ]
+            },
+            "allowOutsideOutputDir": true
+          },
+          "bundlesHash": false,
+          "chunksHash": false,
+          "moduleRoots": [
+            "dist/packages"
+          ],
+          "moduleReplacements": [
+            {
+              "resourcePath": "./environments/environment.ts",
+              "newResourcePath": "./environments/environment.prod.ts"
+            }
+          ]
+        },
+        "aot": {
+          "polyfills": [
+            "polyfills.ts"
+          ]
+        }
+      }
+    }
+  ]
+  //"logLevel": "debug"
+}

@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "ng-cache asp.net core sample";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewData["Title"]</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    @Html.Partial("_BaseHref.generated")
+    @Html.Partial("_Favicons.generated")
+    @Html.Partial("_ResourceHints.generated")
+    @*@Html.Partial("_ApplicationInsightsSnippet")*@
+    @Html.Partial("_Styles.generated")
+    @*@Html.Partial("_PolyfillsSnippet")*@
+    @Html.Partial("_Runtime.generated")
+</head>
+<body>
+    @RenderBody()
+    @{await Html.RenderPartialAsync("_Scripts.generated"); }
+    @RenderSection("Scripts", required: false)
+    @{await Html.RenderPartialAsync("_NoScript"); }
+</body>
+</html>

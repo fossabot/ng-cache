@@ -1,0 +1,26 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "declaration": false,
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "noEmitOnError": true,
+    "types": [],
+    "lib": [
+      "es2017",
+      "dom"
+    ],
+
+    "outDir": "./dist/out-tsc",
+    "baseUrl": ".",
+    // "rootDir": ".",
+
+    "paths": {
+      "@bizappframework/ng-cache": [ "../../../modules/ng-cache" ],
+      "@bizappframework/ng-cache-ngrx-store": [ "../../../modules/ng-cache-ngrx-store" ],
+      "app/*": [ "./app/*" ],
+      "environments/*": [ "./environments/*" ]
+    }
+  }
+}

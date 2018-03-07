@@ -1,0 +1,11 @@
+﻿{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": ".",
+    "paths": {
+      "@bizappframework/ng-cache": [ "./ng-cache" ],
+      "@bizappframework/ng-cache-ngrx-store": [ "./ng-cache-ngrx-store" ]
+    }
+  }
+}

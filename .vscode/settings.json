@@ -1,0 +1,21 @@
+{
+  "vsicons.presets.angular": true,
+  "files.exclude": {
+    "**/.vs": true,
+    "**/bin": true,
+    "**/obj": true,
+    "**/*.user": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/dist": true,
+    "**/wwwroot": true,
+    "**/out-tsc": true,
+    "*.DotSettings": true,
+    "*.sln": true,
+    "**/*.csproj": true,
+    "**/*.njsproj": true,
+    "package-lock.json": true
+  },
+}

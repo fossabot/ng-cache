@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "moduleResolution": "node",
+
+    "experimentalDecorators": true,
+    // This is needed due to https://github.com/Microsoft/TypeScript/issues/17516.
+    // As tsickle will lower decorators before TS, this is not a problem for our build.
+    "emitDecoratorMetadata": true,
+
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitThis": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "strictNullChecks": true,
+    "stripInternal": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "sourceMap": true,
+    "inlineSources": true,
+    "declaration": true,
+
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "lib": [ "es2017", "dom" ],
+
+    "rootDir": ".",
+    "outDir": "./out-tsc"
+  },
+  "exclude": [
+    "node_modules",
+    "**/dist",
+    "**/out-tsc"
+  ]
+}

@@ -1,0 +1,24 @@
+﻿{
+  "extends": "../tsconfig-build.json",
+
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": ".",
+    "paths": {
+      "@angular/core": [ "../../node_modules/@angular/core" ],
+      "rxjs/*": [ "../../node_modules/rxjs/*" ]
+    },
+    "outDir": "../../dist/packages/ng-cache"
+  },
+  "files": [
+    "public_api.ts"
+  ],
+  "angularCompilerOptions": {
+    "annotateForClosureCompiler": true,
+    "strictMetadataEmit": true,
+    "skipTemplateCodegen": true,
+    "fullTemplateTypeCheck": true,
+    "flatModuleOutFile": "index.js",
+    "flatModuleId": "@bizappframework/ng-cache"
+  }
+}

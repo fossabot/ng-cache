@@ -1,0 +1,16 @@
+{
+  "name": "@bizappframework/ng-cache",
+  "version": "0.0.0",
+  "description": "Contains cache services for Angular app.",
+  "keywords": [],
+  "author": "",
+  "license": "",
+  "repository": "",
+  "dependencies": {
+    "tslib": "^1.9.0"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=5.0.0",
+    "@bizappframework/ng-logging": ">=5.0.0-beta.0"
+  }
+}

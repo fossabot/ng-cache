@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "main.server.ts",
+    "main.server.prod.ts"
+  ]
+}

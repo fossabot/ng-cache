@@ -1,0 +1,22 @@
+sudo: false
+dist: trusty
+language: node_js
+node_js:
+  - "8"
+env:
+  global:
+    - DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+    - DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    - ANGULAR_BUILD_TELEMETRY_OPTOUT: 1
+branches:
+  only:
+    - master
+install:
+  - npm install -g @bizappframework/angular-build
+  - npm install
+  - npm link @bizappframework/angular-build
+script:
+  - node ./node_modules/@bizappframework/angular-build/bin/ngb build --disable-telemetry --env.prod --env.aot --env.generate
+cache:
+  directories:
+    - ./node_modules

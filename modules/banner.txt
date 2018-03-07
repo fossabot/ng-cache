@@ -1,0 +1,5 @@
+/**
+ * @license $PACKAGE_NAME$@$PACKAGE_VERSION$
+ * Copyright (c) $CURRENT_YEAR$ Octalhouse.
+ * License: MIT
+  */

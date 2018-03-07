@@ -1,0 +1,21 @@
+﻿{
+  "extends": "../tsconfig-build.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": ".",
+    "paths": {
+      "@ngrx/store": [ "../../node_modules/@ngrx/store" ],
+      "@bizappframework/ng-cache": [ "../../dist/packages/ng-cache" ]
+    },
+    "outDir": "../../dist/packages/ng-cache-ngrx-store"
+  },
+  "files": [
+    "public_api.ts"
+  ],
+  "angularCompilerOptions": {
+    "annotateForClosureCompiler": true,
+    "strictMetadataEmit": true,
+    "flatModuleOutFile": "index.js",
+    "flatModuleId": "@bizappframework/ng-cache-ngrx-store"
+  }
+}
