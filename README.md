@@ -1,12 +1,14 @@
 # ng-cache
 
+<!-- Badges section here. -->
+[![Build status](https://img.shields.io/appveyor/ci/mmzliveid/ng-cache.svg?label=appveyor)](https://ci.appveyor.com/project/mmzliveid/ng-cache)
+[![Build Status](https://img.shields.io/travis/BizAppFramework/ng-cache/master.svg?label=travis)](https://travis-ci.org/BizAppFramework/ng-cache)
+
 Contains cache modules for Angular app.
 
 ## Packages
 
--
-
-[@bizappframework/ng-cache](https://www.npmjs.com/package/@bizappframework/ng-cache)
+[@bizappframework/ng-cache](https://www.npmjs.com/package/@bizappframework/ng-cache)  
 [@bizappframework/ng-cache-ngrx-store](https://www.npmjs.com/package/@bizappframework/ng-cache-ngrx-store)
 
 ## Example
