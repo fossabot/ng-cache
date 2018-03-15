@@ -9,7 +9,7 @@ export interface CacheOptions {
     clearPreviousCache?: boolean;
     enableDebug?: boolean;
     remoteCacheCheckInterval?: number;
-    remoteCacheCheckerEndpointUrl?: string;
+    remoteCacheCheckerEndpointUrl?: string | (() => string);
     useDefaultRemoteCacheChecker?: boolean;
     remoteCacheChecker?(key: string, hash: string): Observable<CacheCheckResult>;
 }

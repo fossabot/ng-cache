@@ -52,7 +52,7 @@ export const DEFAULT_CACHE_TRANSFER_KEY = 'APP_CACHE';
             clearPreviousCache: !environment.production,
             enableDebug: !environment.production,
             useDefaultRemoteCacheChecker: true,
-            remoteCacheCheckerEndpointUrl: `${getOriginUrl()}/api/cache/check`,
+            remoteCacheCheckerEndpointUrl: getRemoteCacheCheckerEndpointUrl,
             remoteCacheCheckInterval: 30000 // for testing only, default is 1 hour
         }),
         CacheLocalStorageModule,
@@ -79,6 +79,10 @@ export class AppModule { }
 
 export function getOriginUrl(): string {
     return window.location.origin;
+}
+
+export function getRemoteCacheCheckerEndpointUrl(): string {
+    return `${getOriginUrl()}/api/cache/check`;
 }
 
 export function getTransferData(cacheKey: string): any {

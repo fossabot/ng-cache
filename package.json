@@ -1,6 +1,6 @@
 {
   "name": "@bizappframework/ng-cache",
-  "version": "5.0.0-beta.1",
+  "version": "5.0.0-beta.2",
   "description": "Cache services for Angular app.",
   "author": "BizAppFramework Team",
   "license": "MIT",

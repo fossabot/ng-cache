@@ -42,7 +42,10 @@ export class CacheService {
             }
 
             const httpClient = this._httpClient;
-            const remoteCacheCheckerEndpointUrl = this._cacheOptions.remoteCacheCheckerEndpointUrl;
+            const remoteCacheCheckerEndpointUrl = typeof this._cacheOptions.remoteCacheCheckerEndpointUrl === 'string'
+                ? this._cacheOptions.remoteCacheCheckerEndpointUrl
+                : (<Function>this._cacheOptions.remoteCacheCheckerEndpointUrl)();
+
             this._cacheOptions.remoteCacheChecker = (key: string, hash: string): Observable<CacheCheckResult> => {
                 return httpClient.post<CacheCheckResult>(remoteCacheCheckerEndpointUrl, { key: key, hash: hash });
             };
