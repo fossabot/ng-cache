@@ -1,4 +1,4 @@
-import { Inject, Injectable, Optional } from '@angular/core';
+import { Inject, Injectable, InjectionToken, Optional } from '@angular/core';
 
 import { Cache, CacheItem, STORAGE, Storage } from '@bizappframework/ng-cache';
 import { select, Store } from '@ngrx/store';
@@ -7,21 +7,24 @@ import { map } from 'rxjs/operators';
 import { CacheState } from './cache-state';
 import * as cacheActions from './cache.actions';
 
-export const cacheStateKey = 'cache';
+export const CACHE_STATE_KEY = new InjectionToken<string>('CACHE_STATE_KEY');
 
- @Injectable()
+export const DEFAULT_CACHE_STATE_KEY = 'cache';
+
+@Injectable()
 export class NgrxStoreCache implements Cache {
-    // tslint:disable-next-line:no-any
-     constructor(private readonly _store: Store<any>, @Optional() @Inject(STORAGE) readonly storage: Storage) {
-        if (!_store) {
-            throw new Error("'Store' service is not available.");
-        }
+    private readonly _cacheStateKey: string;
+
+    constructor(private readonly _store: Store<any>,
+        @Optional() @Inject(STORAGE) readonly storage: Storage,
+        @Optional() @Inject(CACHE_STATE_KEY) cacheStateKey: string) {
+        this._cacheStateKey = cacheStateKey || DEFAULT_CACHE_STATE_KEY;
     }
 
     get keys(): string[] {
         let keyArray: string[] = [];
         this._store.pipe(
-            select(state => state[cacheStateKey]),
+            select(state => state[this._cacheStateKey]),
             map((state: CacheState) => state.data))
             .subscribe((data: { [key: string]: CacheItem }) => {
                 if (data) {
@@ -31,7 +34,9 @@ export class NgrxStoreCache implements Cache {
                 if (this.storage && this.storage.enabled) {
                     const storeKeys = this.storage.keys;
                     if (storeKeys) {
-                        storeKeys.filter(k => keyArray.indexOf(k) === -1).forEach(k => keyArray.push(k));
+                        storeKeys
+                            .filter(k => !keyArray.includes(k))
+                            .forEach(k => keyArray.push(k));
                     }
                 }
             });
@@ -40,13 +45,13 @@ export class NgrxStoreCache implements Cache {
     }
 
     init(data?: { [key: string]: CacheItem }): void {
-        this._store.dispatch(new cacheActions.Init(data));
+        this._store.dispatch(new cacheActions.SetInitialCache(data));
     }
 
     getItem(key: string): CacheItem | undefined {
         let retValue: CacheItem | undefined;
         this._store.pipe(
-            select(state => state[cacheStateKey]),
+            select(state => state[this._cacheStateKey]),
             map((state: CacheState) => state.data))
             .subscribe((data: { [key: string]: CacheItem }) => {
                 if (data) {
@@ -60,10 +65,8 @@ export class NgrxStoreCache implements Cache {
         return retValue;
     }
 
-    setItem(key: string, value: CacheItem): boolean {
-        this._store.dispatch(new cacheActions.SetItem({ key: key, value: value }));
-
-        return true;
+    setItem(key: string, value: CacheItem): void {
+        this._store.dispatch(new cacheActions.SetItem(key, value));
     }
 
     removeItem(key: string): void {

@@ -5,5 +5,5 @@
 
 export const environment = {
     production: false,
-    useNgrxStoreCache: false
+    useNgrxStoreCache: true
 };

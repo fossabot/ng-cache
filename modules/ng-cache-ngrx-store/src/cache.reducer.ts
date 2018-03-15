@@ -1,43 +1,32 @@
- import { CacheState } from './cache-state';
+import { CacheState } from './cache-state';
 import { CacheActions, CacheActionTypes } from './cache.actions';
 
- export const initialState: CacheState = {
-     data: {},
-    loading: false,
-    loaded: false
+export const initialState: CacheState = {
+    data: {}
 };
 
 export function cacheReducer(state: CacheState = initialState, action: CacheActions): CacheState {
     switch (action.type) {
-        case CacheActionTypes.Init:
+        case CacheActionTypes.SetInitialCacheSuccess:
             {
                 return {
                     ...state,
-                    loading: true
+                    data: {
+                        ...state.data,
+                        ...action.payload
+                    }
                 };
             }
-        case CacheActionTypes.InitSuccess:
-            {
-                const newState = {
-                    ...state,
-                    loading: false,
-                    loaded: true
-                };
-                if (action.payload) {
-                    newState.data = {...action.payload};
-                }
-
-                return newState;
-            }
-
         case CacheActionTypes.SetItemSuccess:
             {
-                const newState = {
-                    ...state
+                return {
+                    ...state,
+                    data: {
+                        ...state.data,
+                        [action.key]: action.value
+                    }
                 };
-                newState.data = { ...newState.data, [action.payload.key]: action.payload.value };
 
-                return newState;
             }
         case CacheActionTypes.RemoveItemSuccess:
             {
@@ -45,24 +34,25 @@ export function cacheReducer(state: CacheState = initialState, action: CacheActi
                     ...state
                 };
 
-                const newData: {} = {...newState.data};
-                try {
-                    delete newData[action.payload];
-                } catch (e) {
-                    // do nothing
+                const newData = { ...newState.data };
+                if (newData[action.key]) {
+                    try {
+                        delete newData[action.key];
+                    } catch (e) {
+                        // do nothing
+                    }
                 }
+
                 newState.data = newData;
 
                 return newState;
             }
         case CacheActionTypes.ClearSuccess:
             {
-                const newState = {
-                    ...state
+                return {
+                    ...state,
+                    data: {}
                 };
-                newState.data = {};
-
-                return newState;
             }
         default:
             {

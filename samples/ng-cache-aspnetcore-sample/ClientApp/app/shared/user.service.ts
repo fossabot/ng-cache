@@ -1,31 +1,35 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 
-import { CacheService } from '@bizappframework/ng-cache';
-import { Logger, LoggerFactory } from '@bizappframework/ng-logging';
+import { CacheEntryOptions, CacheService, handleCacheResponse } from '@bizappframework/ng-cache';
 import { Observable } from 'rxjs/Observable';
+import { map } from 'rxjs/operators';
 
 import { BASE_URL } from './tokens';
 
+export enum UserCacheKeys {
+    Users = 'users',
+    UsersCacheInfo = 'users.cacheinfo',
+}
+
 @Injectable()
 export class UserService {
-    private readonly _logger: Logger;
 
     constructor(
         private readonly _cacheService: CacheService,
         private readonly _httpClient: HttpClient,
-        @Inject(BASE_URL) private readonly _baseUrl: string,
-        loggerFactory: LoggerFactory) {
-        this._logger = loggerFactory.createLogger('app');
+        @Inject(BASE_URL) private readonly _baseUrl: string) {
     }
 
     getUsers(): Observable<string[]> {
-        return this._cacheService.getOrSet<string[]>('users',
-            () => {
+        return this._cacheService.getOrSet(UserCacheKeys.Users,
+            (entryOptions: CacheEntryOptions) => {
                 const endpointUrl = `${this._baseUrl}/api/users`;
-                this._logger.debug(`Fetching users from ${endpointUrl}`);
 
-                return this._httpClient.get<string[]>(endpointUrl);
+                return this._httpClient.get(endpointUrl, { observe: 'response' }).pipe(map(
+                    (response: HttpResponse<string[]>) => {
+                        return handleCacheResponse<string[]>(response, UserCacheKeys.UsersCacheInfo, entryOptions);
+                    }));
             });
     }
 }

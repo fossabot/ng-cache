@@ -8,7 +8,7 @@ export interface Cache {
     readonly storage: Storage | null | undefined;
     init(data?: { [key: string]: CacheItem }): void;
     getItem(key: string): CacheItem | null | undefined;
-    setItem(key: string, value: CacheItem): boolean;
+    setItem(key: string, value: CacheItem): void;
     removeItem(key: string): void;
     clear(): void;
 }

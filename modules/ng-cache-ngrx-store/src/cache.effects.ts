@@ -6,15 +6,15 @@ import { Action } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { map, tap } from 'rxjs/operators';
 
-import { Storage, STORAGE } from '@bizappframework/ng-cache';
+import { CacheItem, Storage, STORAGE } from '@bizappframework/ng-cache';
 
 import {
     CacheActionTypes,
     ClearSuccess,
-    Init,
-    InitSuccess,
     RemoveItem,
     RemoveItemSuccess,
+    SetInitialCache,
+    SetInitialCacheSuccess,
     SetItem,
     SetItemSuccess
 } from './cache.actions';
@@ -22,43 +22,42 @@ import {
 @Injectable()
 export class CacheEffects {
     @Effect()
-    init$: Observable<Action> = this._actions$.pipe(
-        ofType(CacheActionTypes.Init),
-        map((action: Init) => action.payload),
-        tap(data => {
+    setInitialCache$: Observable<Action> = this._actions$.pipe(
+        ofType(CacheActionTypes.SetInitialCache),
+        map((action: SetInitialCache) => action.payload),
+        tap((data: { [key: string]: CacheItem }) => {
             if (data && this._storage && this._storage.enabled) {
-                const storage = <Storage>this._storage;
+                const storage = this._storage;
                 Object.keys(data).forEach(key => {
                     const value = data[key];
                     storage.setItem(key, value);
                 });
             }
         }),
-        map(data => new InitSuccess(data))
+        map((data: { [key: string]: CacheItem }) => new SetInitialCacheSuccess(data))
     );
 
     @Effect()
     setItem$: Observable<Action> = this._actions$.pipe(
         ofType(CacheActionTypes.SetItem),
-        map((action: SetItem) => action.payload),
-        tap(data => {
+        tap((action: SetItem) => {
             if (this._storage && this._storage.enabled) {
-                this._storage.setItem(data.key, data.value);
+                this._storage.setItem(action.key, action.value);
             }
         }),
-        map(data => new SetItemSuccess(data))
+        map((action: SetItem) => new SetItemSuccess(action.key, action.value))
     );
 
     @Effect()
     removeItem$: Observable<Action> = this._actions$.pipe(
         ofType(CacheActionTypes.RemoveItem),
-        map((action: RemoveItem) => action.payload),
-        tap(key => {
+        map((action: RemoveItem) => action.key),
+        tap((key: string) => {
             if (this._storage && this._storage.enabled) {
                 this._storage.removeItem(key);
             }
         }),
-        map(key => new RemoveItemSuccess(key))
+        map((key: string) => new RemoveItemSuccess(key))
     );
 
     @Effect()

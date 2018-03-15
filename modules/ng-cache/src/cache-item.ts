@@ -1,8 +1,7 @@
 export interface CacheItem {
-    // tslint:disable-next-line:no-any
-    data: any;
-    localOnlyCache?: boolean;
-    appBuildNumber?: string;
+    data: Object;
     hash?: string;
-    absoluteExpiration?: number;
+    absoluteExpiration?: number | null;
+    lastAccessTime?: number | null;
+    lastRemoteCheckTime?: number | null;
 }

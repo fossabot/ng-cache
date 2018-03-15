@@ -93,6 +93,7 @@
       "ignore-params"
     ],
     "no-misused-new": true,
+    "no-any": false,
     "no-non-null-assertion": true,
     "no-parameter-properties": false,
     "no-shadowed-variable": true,

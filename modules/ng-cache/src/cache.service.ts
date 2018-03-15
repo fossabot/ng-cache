@@ -1,95 +1,92 @@
+import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, Optional } from '@angular/core';
 
-import { Logger, LoggerFactory } from '@bizappframework/ng-logging';
+import { LoggerFactory } from '@bizappframework/ng-logging';
 import { Observable } from 'rxjs/Observable';
+import { fromPromise } from 'rxjs/observable/fromPromise';
 import { of } from 'rxjs/observable/of';
-import { map } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 import { Cache, CACHE } from './cache';
-import { CACHE_CHECK_INFO, CacheCheckInfo } from './cache-check-info';
+import { CacheCheckResult } from './cache-check-result';
+import { CacheEntryOptions } from './cache-entry-options';
 import { CacheItem } from './cache-item';
-import { CacheOptions } from './cache-options';
+import { CACHE_OPTIONS, CacheOptions } from './cache-options';
 import { INITIAL_CACHE_DATA, InitialCacheData } from './initial-cache-data';
+import { ReturnType } from './return-type';
+import { VERSION } from './version';
 
 @Injectable()
 export class CacheService {
-    private readonly _logger: Logger;
+    private readonly _cacheOptions: CacheOptions;
+    private readonly _logger: {
+        debug(message: string): void;
+        error(message: string | Error): void;
+    };
+    private readonly _remoteCacheCheckInterval = 1000 * 60 * 60;
 
     constructor(@Inject(CACHE) private readonly _cache: Cache,
-        loggerFactory: LoggerFactory,
-        @Optional() @Inject(CACHE_CHECK_INFO) private readonly _cacheCheckInfo?: CacheCheckInfo,
-        @Optional() @Inject(INITIAL_CACHE_DATA) data?: InitialCacheData) {
-        this._logger = loggerFactory.createLogger('bizappframework.ng-cache.cache-service');
-
-        // validate cache
-        if (this._cacheCheckInfo && this._cache.storage && this._cache.storage.enabled) {
-            this._logger.debug('Checking cache validity');
-
-            const cacheValidationInfoLocal = this._cacheCheckInfo;
-            const storageLocal = this._cache.storage;
-            const storedKeys = storageLocal.keys;
-
-            if (cacheValidationInfoLocal.clearLocalStorage) {
-                this._logger.debug('Clearing local storage cache');
-                storageLocal.clear();
-            } else if (cacheValidationInfoLocal.itemInfo) {
-                Object.keys(cacheValidationInfoLocal.itemInfo)
-                    .filter(key => storedKeys.includes(key))
-                    .forEach(key => {
-                        const storedItem = storageLocal.getItem(key);
-                        if (storedItem && this.isValid(key, storedItem)) {
-                            this._logger.debug(`Removing cache from storage, key: ${key}`);
-                            storageLocal.removeItem(key);
-                        }
-                    });
+        @Optional() private readonly _httpClient?: HttpClient,
+        @Optional() @Inject(INITIAL_CACHE_DATA) data?: InitialCacheData,
+        @Optional() @Inject(CACHE_OPTIONS) options?: CacheOptions,
+        @Optional() loggerFactory?: LoggerFactory) {
+        this._cacheOptions = {
+            ...options
+        };
+        if (this._cacheOptions.remoteCacheCheckInterval) {
+            this._remoteCacheCheckInterval = this._cacheOptions.remoteCacheCheckInterval;
+        }
+        if (this._cacheOptions.useDefaultRemoteCacheChecker && this._cacheOptions.remoteCacheCheckerEndpointUrl) {
+            if (!this._httpClient) {
+                throw new Error('HttpClient service is not provided.');
             }
+
+            const httpClient = this._httpClient;
+            const remoteCacheCheckerEndpointUrl = this._cacheOptions.remoteCacheCheckerEndpointUrl;
+            this._cacheOptions.remoteCacheChecker = (key: string, hash: string): Observable<CacheCheckResult> => {
+                return httpClient.post<CacheCheckResult>(remoteCacheCheckerEndpointUrl, { key: key, hash: hash });
+            };
+        }
+
+        this._logger = loggerFactory
+            ? loggerFactory.createLogger('bizappframework.ng-cache.cache-service')
+            : {
+                debug(message: string): void {
+                    // tslint:disable-next-line:no-console
+                    console.debug(message);
+                },
+                error(message: Error | string): void {
+                    console.error(message);
+                }
+            };
+
+        if (this._cacheOptions.clearPreviousCache) {
+            this.clear();
+        } else {
+            this.checkStorage();
         }
 
         // init cache
-        const initialData: { [key: string]: CacheItem } = {};
         if (data) {
-            Object.keys(data)
-                .forEach((key: string) => {
-                    const value = data[key];
-                    initialData[key] = {
-                        data: value,
-                        appBuildNumber: this.getAppBuildNumberFromInfo(),
-                        hash: this.getHashFromInfo(key),
-                        absoluteExpiration: this.getExpirationFromInfo(key)
-                    };
-                });
-        }
-
-        this._cache.init(initialData);
-    }
-
-    // tslint:disable-next-line:no-any
-    setItem(key: string, value: { [key: string]: any }, cacheOptions?: CacheOptions): boolean {
-        const hash = this.getHashFromInfo(key);
-        const options: CacheOptions = { hash: hash, ...cacheOptions };
-        if (options.absoluteExpiration != null && options.absoluteExpiration <= 0) {
-            throw new Error('The absolute expiration value must be positive.');
-        }
-
-        this._logger.debug(`Setting cache, key: ${key}`);
-
-        return this._cache.setItem(key,
-            {
-                data: value,
-                absoluteExpiration: options.absoluteExpiration,
-                hash: options.hash
+            const mappedData: { [key: string]: CacheItem } = {};
+            Object.keys(data).forEach(key => {
+                const cacheItem: CacheItem = {
+                    data: data[key]
+                };
+                mappedData[key] = cacheItem;
             });
+            this._cache.init(mappedData);
+        }
     }
 
-    getItem<T>(key: string): T;
+    getItem<T>(key: string): T | null;
 
-    // tslint:disable-next-line:no-any
     getItem(key: string): any {
         const cachedItem = this._cache.getItem(key);
 
         if (cachedItem) {
-            if (this.isValid(key, cachedItem)) {
-                this._logger.debug(`Retrieved from cache, key: ${key}`);
+            if (this.isValid(cachedItem)) {
+                this.refreshLastAccessTime(key, cachedItem);
 
                 return cachedItem.data;
             } else {
@@ -100,73 +97,250 @@ export class CacheService {
         return null;
     }
 
-    getOrSet<T>(key: string, factory: () => Observable<T>, options?: CacheOptions): Observable<T>;
+    getOrSetSync<T>(key: string, factory: (entryOptions: CacheEntryOptions) => T, options?: CacheEntryOptions): T;
 
-    // tslint:disable-next-line:no-any
-    getOrSet(key: string, factory: () => Observable<any>, options?: CacheOptions): Observable<any> {
-        const cachedItem = this._cache.getItem(key);
-        if (cachedItem) {
-            if (this.isValid(key, cachedItem)) {
-                this._logger.debug(`Retrieved from cache, key: ${key}`);
+    getOrSetSync(key: string, factory: (entryOptions: CacheEntryOptions) => any, options?: CacheEntryOptions): any {
+        return this.getOrSetInternal(key, factory, options, ReturnType.Sync);
+    }
 
-                return of(cachedItem.data);
-            } else {
-                this.removeItem(key);
-            }
-        }
+    async getOrSetPromise<T>(key: string,
+        factory: (entryOptions: CacheEntryOptions) => Promise<T>,
+        options?: CacheEntryOptions,
+        remoteCacheChecker?: (key: string, hash?: string) => Observable<CacheCheckResult>): Promise<T>;
 
-        // tslint:disable-next-line:no-any
-        return factory().pipe(map((value: any) => {
-            this.setItem(key, value, options);
+    async getOrSetPromise(key: string,
+        factory: (entryOptions: CacheEntryOptions) => Promise<any>,
+        options?: CacheEntryOptions,
+        remoteCacheChecker?: (key: string, hash?: string) => Observable<CacheCheckResult>): Promise<any> {
+        return <Promise<any>>this.getOrSetInternal(key, factory, options, ReturnType.Promise, remoteCacheChecker);
+    }
 
-            return value;
-        }));
+    getOrSet<T>(key: string,
+        factory: (entryOptions: CacheEntryOptions) => Observable<T>,
+        options?: CacheEntryOptions,
+        remoteCacheChecker?: (key: string, hash?: string) => Observable<CacheCheckResult>): Observable<T>;
 
+    getOrSet(key: string,
+        factory: (entryOptions: CacheEntryOptions) => Observable<any>,
+        options?: CacheEntryOptions,
+        remoteCacheChecker?: (key: string, hash?: string) => Observable<CacheCheckResult>): Observable<any> {
+        return <Observable<any>>this.getOrSetInternal(key, factory, options, ReturnType.Observable, remoteCacheChecker);
+    }
+
+    setItem(key: string, value: Object, options?: CacheEntryOptions): void {
+        const entryOptions = this.prepareCacheEntryOptions(options);
+        this.setItemInternal(key, value, entryOptions, false, false);
     }
 
     removeItem(key: string): void {
-        this._logger.debug(`Removing cache, key: ${key}`);
         this._cache.removeItem(key);
     }
 
     clear(): void {
-        this._logger.debug('Clearing cache');
         this._cache.clear();
     }
 
-    private getAppBuildNumberFromInfo(): string | undefined {
-        if (this._cacheCheckInfo) {
-            return this._cacheCheckInfo.appBuildNumber;
+    private checkStorage(): void {
+        if (!this._cache.storage ||
+            !this._cache.storage.enabled) {
+            return;
         }
 
-        return undefined;
+        const storageLocal = this._cache.storage;
+
+        this.logDebug('Checking storage cache');
+
+        const ngCacheVersion = storageLocal._getNgCacheVersion();
+        if (ngCacheVersion !== VERSION) {
+            this.clear();
+            storageLocal._setNgCacheVersion(VERSION);
+        } else {
+            storageLocal.keys.forEach(key => {
+                const cacheItem = storageLocal.getItem(key);
+                if (!cacheItem || !this.isValid(cacheItem)) {
+                    storageLocal.removeItem(key);
+                }
+            });
+        }
     }
 
-    private getHashFromInfo(key: string): string | undefined {
-        if (this._cacheCheckInfo &&
-            this._cacheCheckInfo.itemInfo &&
-            this._cacheCheckInfo.itemInfo[key]) {
-            const itemInfo = this._cacheCheckInfo.itemInfo[key];
+    private logDebug(message: string): void {
+        if (this._cacheOptions.enableDebug) {
+            this._logger.debug(message);
+        }
+    }
 
-            return itemInfo.hash;
+    private logError(message: Error | string): void {
+        this._logger.error(message);
+    }
+
+    private getOrSetInternal(key: string,
+        factory: (entryOptions: CacheEntryOptions) => Observable<any> | Promise<any> | Object,
+        options?: CacheEntryOptions,
+        returnType: ReturnType = ReturnType.Observable,
+        remoteCacheChecker?: (key: string, hash: string) => Observable<CacheCheckResult>): Observable<any> |
+        Promise<any> |
+        Object {
+        const entryOptions = this.prepareCacheEntryOptions(options);
+        const cachedItem = this._cache.getItem(key);
+
+        if (!cachedItem) {
+            return this.invokeFactory(key, factory, entryOptions);
         }
 
-        return undefined;
-    }
+        if (!this.isValid(cachedItem)) {
+            this.removeItem(key);
 
-    private getExpirationFromInfo(key: string): number | undefined {
-        if (this._cacheCheckInfo &&
-            this._cacheCheckInfo.itemInfo &&
-            this._cacheCheckInfo.itemInfo[key]) {
-            const itemInfo = this._cacheCheckInfo.itemInfo[key];
-
-            return itemInfo.absoluteExpiration;
+            return this.invokeFactory(key, factory, entryOptions);
         }
 
-        return undefined;
+        let cacheChecker = remoteCacheChecker;
+        if (!cacheChecker && this._cacheOptions.remoteCacheChecker && returnType !== ReturnType.Sync) {
+            cacheChecker = this._cacheOptions.remoteCacheChecker;
+        }
+
+        if (cacheChecker &&
+            cachedItem.hash &&
+            (!cachedItem.lastRemoteCheckTime ||
+                cachedItem.lastRemoteCheckTime <= Date.now() - this._remoteCacheCheckInterval)) {
+            if (returnType === ReturnType.Sync) {
+                throw new Error("To use remote cache checker, returnType must be 'Observable' or 'Promise'.");
+            }
+
+            this.logDebug('Invoking remote cache checker function');
+            const ret$ = cacheChecker(key, cachedItem.hash)
+                .pipe(catchError(err => {
+                    this.logError(err);
+
+                    return of(null);
+                }),
+                    switchMap((result: CacheCheckResult) => {
+                        // if error
+                        if (!result) {
+                            this.refreshLastAccessTime(key, cachedItem);
+
+                            return of(cachedItem.data);
+                        }
+
+                        if (result.expired) {
+                            this.logDebug(`Cache expired, key: ${key}`);
+                            this.removeItem(key);
+
+                            if (result.absoluteExpiration) {
+                                entryOptions.absoluteExpiration = result.absoluteExpiration;
+                            }
+                            if (result.hash) {
+                                entryOptions.hash = result.hash;
+                            }
+
+                            const retValue$ = this.invokeFactory(key, factory, entryOptions, true);
+                            if (retValue$ instanceof Observable) {
+                                return retValue$;
+                            } else if (retValue$ instanceof Promise) {
+                                return fromPromise(retValue$);
+                            } else {
+                                return of(retValue$);
+                            }
+                        } else {
+                            this.logDebug(`Cache valid, key: ${key}`);
+                            cachedItem.lastRemoteCheckTime = Date.now();
+                            if (result.absoluteExpiration) {
+                                cachedItem.absoluteExpiration = result.absoluteExpiration;
+                            }
+                            this.refreshLastAccessTime(key, cachedItem);
+
+                            return of(cachedItem.data);
+                        }
+                    }));
+
+            if (returnType === ReturnType.Promise) {
+                return ret$.toPromise();
+            } else {
+                return ret$;
+            }
+        }
+
+        this.refreshLastAccessTime(key, cachedItem);
+
+        if (returnType === ReturnType.Sync) {
+            return cachedItem.data;
+        } else if (returnType === ReturnType.Promise) {
+            return Promise.resolve(cachedItem.data);
+        } else {
+            return of(cachedItem.data);
+        }
     }
 
-    private isValid(key: string, cachedItem: CacheItem): boolean {
+    private invokeFactory(key: string,
+        factory: (entryOptions: CacheEntryOptions) => Observable<any> | Promise<any> | Object,
+        options: CacheEntryOptions,
+        setLastRemoteCheckTime?: boolean):
+        Observable<any> | Promise<any> | Object {
+        const retValue$ = factory(options);
+
+        if (retValue$ instanceof Observable) {
+            return retValue$.pipe(map(value => {
+                this.setItemInternal(key, value, options, true, setLastRemoteCheckTime);
+
+                return value;
+            }));
+        } else if (retValue$ instanceof Promise) {
+            return retValue$.then(value => {
+                this.setItemInternal(key, value, options, true, setLastRemoteCheckTime);
+
+                return value;
+            });
+        } else {
+            this.setItemInternal(key, retValue$, options, true, setLastRemoteCheckTime);
+
+            return retValue$;
+        }
+    }
+
+    private setItemInternal(key: string,
+        value: Object,
+        options: CacheEntryOptions,
+        setLastAccessTime: boolean,
+        setLastRemoteCheckTime?: boolean): void {
+        const cacheItem: CacheItem = {
+            data: value,
+            absoluteExpiration: options.absoluteExpiration,
+            hash: options.hash
+        };
+
+        const now = Date.now();
+
+        if (setLastAccessTime) {
+            cacheItem.lastAccessTime = now;
+        }
+        if (setLastRemoteCheckTime || (setLastRemoteCheckTime !== false && cacheItem.hash)) {
+            cacheItem.lastRemoteCheckTime = now;
+        }
+
+        this._cache.setItem(key, cacheItem);
+    }
+
+    private refreshLastAccessTime(key: string, cachedItem: CacheItem): void {
+        cachedItem.lastAccessTime = Date.now();
+        this._cache.setItem(key, cachedItem);
+    }
+
+    private prepareCacheEntryOptions(options?: CacheEntryOptions): CacheEntryOptions {
+        if (options && options.absoluteExpiration != null && options.absoluteExpiration <= 0) {
+            throw new Error('The absolute expiration value must be positive.');
+        }
+
+        const absoluteExpiration = this._cacheOptions.absoluteExpirationRelativeToNow
+            ? Date.now() + this._cacheOptions.absoluteExpirationRelativeToNow
+            : undefined;
+
+        return {
+            absoluteExpiration: absoluteExpiration,
+            ...options
+        };
+    }
+
+    private isValid(cachedItem: CacheItem): boolean {
         let valid = cachedItem.data != null;
         if (!valid) {
             return false;
@@ -176,39 +350,6 @@ export class CacheService {
             valid = cachedItem.absoluteExpiration > Date.now();
         }
 
-        if (!valid) {
-            return false;
-        }
-
-        if (cachedItem.localOnlyCache) {
-            return true;
-        }
-
-        const appBuildNumber = this.getAppBuildNumberFromInfo();
-        if (appBuildNumber) {
-            valid = cachedItem.appBuildNumber === appBuildNumber;
-            if (!valid) {
-                return false;
-            }
-        }
-
-        const cacheInfoHash = this.getHashFromInfo(key);
-        if (cacheInfoHash) {
-            valid = cachedItem.hash === cacheInfoHash;
-            if (!valid) {
-                return false;
-            }
-        }
-
-        const cacheInfoExpiration = this.getExpirationFromInfo(key);
-        if (cacheInfoExpiration != null) {
-            valid = cachedItem.absoluteExpiration != null &&
-                cachedItem.absoluteExpiration > cacheInfoExpiration;
-            if (!valid) {
-                return false;
-            }
-        }
-
-        return true;
+        return valid;
     }
 }

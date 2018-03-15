@@ -43,13 +43,11 @@ export class MemoryCache implements Cache {
             });
     }
 
-    setItem(key: string, value: CacheItem): boolean {
+    setItem(key: string, value: CacheItem): void {
         this._store.set(key, value);
         if (this.storage && this.storage.enabled) {
             this.storage.setItem(key, value);
         }
-
-        return true;
     }
 
     getItem(key: string): CacheItem | null | undefined {

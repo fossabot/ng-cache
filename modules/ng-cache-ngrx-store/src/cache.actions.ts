@@ -1,9 +1,11 @@
 /* tslint:disable:max-classes-per-file */
 import { Action } from '@ngrx/store';
 
+import { CacheItem } from '@bizappframework/ng-cache';
+
 export enum CacheActionTypes {
-    Init = '[Cache] Init',
-    InitSuccess = '[Cache] Init Success',
+    SetInitialCache = '[Cache] Set Initial Cache',
+    SetInitialCacheSuccess = '[Cache] Set Initial Cache Success',
 
     SetItem = '[Cache] Set Item',
     SetItemSuccess = '[Cache] Set Item Success',
@@ -15,50 +17,46 @@ export enum CacheActionTypes {
     ClearSuccess = '[Cache] Clear Success'
 }
 
-export class Init implements Action {
+export class SetInitialCache implements Action {
     // tslint:disable-next-line:no-reserved-keywords
-    readonly type = CacheActionTypes.Init;
+    readonly type = CacheActionTypes.SetInitialCache;
 
-    // tslint:disable-next-line:no-any
-    constructor(public payload?: { [key: string]: any }) { }
+    constructor(public payload?: { [key: string]: CacheItem }) { }
 }
 
-export class InitSuccess implements Action {
+export class SetInitialCacheSuccess implements Action {
     // tslint:disable-next-line:no-reserved-keywords
-    readonly type = CacheActionTypes.InitSuccess;
+    readonly type = CacheActionTypes.SetInitialCacheSuccess;
 
-    // tslint:disable-next-line:no-any
-    constructor(public payload?: { [key: string]: any }) { }
+    constructor(public payload?: { [key: string]: CacheItem }) { }
 }
 
 export class SetItem implements Action {
     // tslint:disable-next-line:no-reserved-keywords
     readonly type = CacheActionTypes.SetItem;
 
-    // tslint:disable-next-line:no-any
-    constructor(public payload: { key: string; value: any }) { }
+    constructor(public key: string, public value: CacheItem) { }
 }
 
 export class SetItemSuccess implements Action {
     // tslint:disable-next-line:no-reserved-keywords
     readonly type = CacheActionTypes.SetItemSuccess;
 
-    // tslint:disable-next-line:no-any
-    constructor(public payload: { key: string; value: any }) { }
+    constructor(public key: string, public value: CacheItem) {}
 }
 
 export class RemoveItem implements Action {
     // tslint:disable-next-line:no-reserved-keywords
     readonly type = CacheActionTypes.RemoveItem;
 
-    constructor(public payload: string) { }
+    constructor(public key: string) { }
 }
 
 export class RemoveItemSuccess implements Action {
     // tslint:disable-next-line:no-reserved-keywords
     readonly type = CacheActionTypes.RemoveItemSuccess;
 
-    constructor(public payload: string) { }
+    constructor(public key: string) { }
 }
 
 export class Clear implements Action {
@@ -72,8 +70,8 @@ export class ClearSuccess implements Action {
 }
 
 export type CacheActions =
-    | Init
-    | InitSuccess
+    | SetInitialCache
+    | SetInitialCacheSuccess
     | SetItem
     | SetItemSuccess
     | RemoveItem

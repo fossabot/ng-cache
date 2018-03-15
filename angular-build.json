@@ -12,12 +12,15 @@
         "copyTemplateAndStyleUrls": false,
         "inlineMetaDataResources": false
       },
+
       "externals": {
         "@bizappframework/ng-logging": "baf.ngLogging"
       },
+
       "packageOptions": {
         "packageJsonFile": "package.json"
       },
+
       "envOverrides": {
         "prod": {
           "clean": {
@@ -67,7 +70,6 @@
       "externals": {
         "@bizappframework/ng-cache": "baf.ngCache",
         "@bizappframework/ng-logging": "baf.ngLogging",
-        "@ngrx/entity": "ngrx.entity",
         "@ngrx/store": "ngrx.store",
         "@ngrx/effects": "ngrx.effects"
       }
@@ -79,18 +81,22 @@
       "platformTarget": "web",
       "srcDir": "samples/ng-cache-aspnetcore-sample/ClientApp",
       "outDir": "samples/ng-cache-aspnetcore-sample/ClientApp/generated",
+
       "clean": {
         "beforeRun": {
           "cleanOutDir": true
         }
       },
+
       "polyfills": [
         "ie-polyfills.ts"
       ],
       "polyfillsChunkName": "ie-polyfills.min",
+
       "bundlesHash": false,
       "publicPath": "/",
       "skip": true,
+
       "envOverrides": {
         "generate": {
           "skip": false
@@ -102,17 +108,21 @@
       "platformTarget": "web",
       "srcDir": "samples/ng-cache-aspnetcore-sample/ClientApp",
       "outDir": "samples/ng-cache-aspnetcore-sample/wwwroot",
+
       "entry": "main.browser.ts",
-      "tsconfig": "tsconfig.browser.json",
+      "tsconfig": "tsconfig.json",
+
       "copy": [
         "favicon.ico",
         "generated/ie-polyfills.min.js"
       ],
+
       "polyfills": [
         "core-js/es6/reflect",
         "core-js/es7/reflect",
         "polyfills.ts"
       ],
+
       "publicPath": "/",
       "baseHref": "~/",
       "htmlInject": {
@@ -127,10 +137,7 @@
           "asp-append-version": "true"
         }
       },
-      //"vendorChunk": true,
-      "environmentVariables": {
-        "aiInstrumentationKey": "process.env.NG_LOGGING_DEMO_APP_INSIGHTS_KEY"
-      },
+
       "envOverrides": {
         "analyze": {
           "bundleAnalyzer": {
@@ -155,11 +162,10 @@
             },
             "allowOutsideOutputDir": true
           },
+
           "bundlesHash": false,
           "chunksHash": false,
-          "moduleRoots": [
-            "dist/packages"
-          ],
+
           "moduleReplacements": [
             {
               "resourcePath": "./environments/environment.ts",
@@ -168,6 +174,8 @@
           ]
         },
         "aot": {
+          "tsconfig": "tsconfig.aot.json",
+
           "polyfills": [
             "polyfills.ts"
           ]

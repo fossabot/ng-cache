@@ -53,22 +53,30 @@
     <TypeScriptCompile Include="ng-cache-ngrx-store\public_api.ts" />
     <TypeScriptCompile Include="ng-cache-ngrx-store\src\cache-state.ts" />
     <TypeScriptCompile Include="ng-cache-ngrx-store\src\cache.actions.ts" />
+    <TypeScriptCompile Include="ng-cache-ngrx-store\src\cache.effects.ts" />
     <TypeScriptCompile Include="ng-cache-ngrx-store\src\cache.reducer.ts" />
     <TypeScriptCompile Include="ng-cache-ngrx-store\src\index.ts" />
-    <TypeScriptCompile Include="ng-cache-ngrx-store\src\ng-cache-ngrx-store.module.ts" />
+    <TypeScriptCompile Include="ng-cache-ngrx-store\src\ngrx-store-cache.module.ts" />
     <TypeScriptCompile Include="ng-cache-ngrx-store\src\ngrx-store-cache.ts" />
     <TypeScriptCompile Include="ng-cache\index.ts" />
     <TypeScriptCompile Include="ng-cache\public_api.ts" />
-    <TypeScriptCompile Include="ng-cache\src\cache-check-info.ts" />
+    <TypeScriptCompile Include="ng-cache\src\cache-check-result.ts" />
+    <TypeScriptCompile Include="ng-cache\src\cache-local-storage.module.ts" />
+    <TypeScriptCompile Include="ng-cache\src\cache-options.ts" />
+    <TypeScriptCompile Include="ng-cache\src\cache.module.ts" />
     <TypeScriptCompile Include="ng-cache\src\cache.service.ts" />
     <TypeScriptCompile Include="ng-cache\src\cache.ts" />
+    <TypeScriptCompile Include="ng-cache\src\handle-cache-response.ts" />
     <TypeScriptCompile Include="ng-cache\src\index.ts" />
     <TypeScriptCompile Include="ng-cache\src\initial-cache-data.ts" />
-    <TypeScriptCompile Include="ng-cache\src\local-storage.service.ts" />
-    <TypeScriptCompile Include="ng-cache\src\cache-options.ts" />
+    <TypeScriptCompile Include="ng-cache\src\cache-local-storage.ts" />
+    <TypeScriptCompile Include="ng-cache\src\cache-entry-options.ts" />
     <TypeScriptCompile Include="ng-cache\src\cache-item.ts" />
+    <TypeScriptCompile Include="ng-cache\src\memory-cache.module.ts" />
     <TypeScriptCompile Include="ng-cache\src\memory-cache.ts" />
+    <TypeScriptCompile Include="ng-cache\src\return-type.ts" />
     <TypeScriptCompile Include="ng-cache\src\storage.ts" />
+    <TypeScriptCompile Include="ng-cache\src\version.ts" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
