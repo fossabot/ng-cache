@@ -8,8 +8,13 @@ Contains cache modules for Angular app.
 
 ## Packages
 
-[@bizappframework/ng-cache](https://www.npmjs.com/package/@bizappframework/ng-cache)  
-[@bizappframework/ng-cache-ngrx-store](https://www.npmjs.com/package/@bizappframework/ng-cache-ngrx-store)
+[@bizappframework/ng-cache](https://www.npmjs.com/package/@bizappframework/ng-cache) 
+[![npm version](https://badge.fury.io/js/%40bizappframework%2Fng-cache.svg)](https://badge.fury.io/js/%40bizappframework%2Fng-cache)  
+Contains cache services for Angular app.
+
+[@bizappframework/ng-cache-ngrx-store](https://www.npmjs.com/package/@bizappframework/ng-cache-ngrx-store) 
+[![npm version](https://badge.fury.io/js/%40bizappframework%2Fng-cache-ngrx-store.svg)](https://badge.fury.io/js/%40bizappframework%2Fng-cache-ngrx-store)  
+Contains ngrx-store wrapper for @bizappframework/ng-cache.
 
 ## Example
 

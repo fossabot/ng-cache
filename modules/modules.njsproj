@@ -39,7 +39,6 @@
     <Content Include="ng-cache\package.json" />
     <Content Include="ng-cache\README.md" />
     <Content Include="ng-cache\tsconfig-build.json" />
-    <Content Include="tsconfig-build.json" />
     <Content Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>

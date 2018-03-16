@@ -1,8 +1,19 @@
 ﻿{
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "target": "es2015",
+    "module": "es2015",
+
+    "importHelpers": true,
+
+    "sourceMap": true,
+    "inlineSources": true,
+    "declaration": true,
+
     "baseUrl": ".",
     "rootDir": ".",
+    "outDir": "../out-tsc",
+
     "paths": {
       "@bizappframework/ng-cache": [ "./ng-cache" ],
       "@bizappframework/ng-cache-ngrx-store": [ "./ng-cache-ngrx-store" ]

@@ -1,12 +1,14 @@
 ng-cache
 =====================
 
+[![npm version](https://badge.fury.io/js/%40bizappframework%2Fng-cache.svg)](https://badge.fury.io/js/%40bizappframework%2Fng-cache)
+
 Contains cache services for Angular app.
 
 Installation
 ---------------
 
-```
+```bash
 npm install @bizappframework/ng-cache
 ```
 

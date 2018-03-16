@@ -1,14 +1,14 @@
 {
-  "extends": "../tsconfig-build.json",
-
+  "extends": "../tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
     "rootDir": ".",
+    "outDir": "../../dist/packages/ng-cache",
+
     "paths": {
       "@angular/core": [ "../../node_modules/@angular/core" ],
       "rxjs/*": [ "../../node_modules/rxjs/*" ]
-    },
-    "outDir": "../../dist/packages/ng-cache"
+    }
   },
   "files": [
     "public_api.ts"

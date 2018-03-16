@@ -20,8 +20,6 @@
     "noFallthroughCasesInSwitch": true,
 
     "sourceMap": true,
-    "inlineSources": true,
-    "declaration": true,
 
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
@@ -34,5 +32,6 @@
     "node_modules",
     "**/dist",
     "**/out-tsc"
-  ]
+  ],
+  "compileOnSave": false
 }
