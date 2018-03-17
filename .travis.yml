@@ -12,6 +12,7 @@ branches:
   only:
     - master
 install:
+  - npm uninstall @bizappframework/angular-build --no-save
   - npm install
   - npm install -g @bizappframework/angular-build
   - npm link @bizappframework/angular-build
