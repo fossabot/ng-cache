@@ -9,22 +9,18 @@ environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   ANGULAR_BUILD_TELEMETRY_OPTOUT: 1
-  npm_auth_token:
-    secure: 2G57TJwGR3m40UD1G7YdkowFzezrhOxEzMKwehKpb1vNPbsbFzfKRIFYVQ7WzZzE
   nodejs_version: "8"
 install:
   - ps: Install-Product node $env:nodejs_version
-  - set CI=true
   - set PATH=%APPDATA%\npm;%PATH%
   - npm install
   - npm install -g @bizappframework/angular-build
   - npm link @bizappframework/angular-build
   - ngb --version
-  - ps: '"//registry.npmjs.org/:_authToken=$env:npm_auth_token`n" | out-file "$env:userprofile\.npmrc" -Encoding ASCII'
-  - npm whoami
 build_script:
   - npm run build
+  - dotnet build samples/ng-cache-aspnetcore-sample/ng-cache-aspnetcore-sample.csproj
 test: off
 cache:
-  - node_modules -> package.json
+  - node_modules -> package-lock.json
   - '%APPDATA%\npm-cache'
