@@ -17,7 +17,8 @@
     "@angular/core": "^5.2.9",
     "@angular/platform-browser": "^5.2.9",
     "@angular/platform-browser-dynamic": "^5.2.9",
-    "@bizappframework/ng-logging": "^5.0.0-beta.0",
+    "@bizappframework/ng-logging": "^5.0.0-beta.2",
+    "@bizappframework/ngrx-store-logger": "^5.0.0-beta.2",
     "@ngrx/effects": "^5.2.0",
     "@ngrx/store": "^5.2.0",
     "@ngrx/store-devtools": "^5.2.0",
@@ -35,8 +36,5 @@
     "vrsource-tslint-rules": "^5.8.1",
     "web-animations-js": "^2.3.1",
     "zone.js": "^0.8.20"
-  },
-  "dependencies": {
-    "@bizappframework/ngrx-store-logger": "^5.0.0-beta.2"
   }
 }
