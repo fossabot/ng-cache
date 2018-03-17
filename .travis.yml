@@ -12,12 +12,8 @@ branches:
   only:
     - master
 install:
-  - npm uninstall @bizappframework/angular-build --no-save
   - npm install
   - npm install -g @bizappframework/angular-build
   - npm link @bizappframework/angular-build
 script:
   - node ./node_modules/@bizappframework/angular-build/bin/ngb build --disable-telemetry --env.prod --env.aot --env.generate
-cache:
-  directories:
-    - ./node_modules
