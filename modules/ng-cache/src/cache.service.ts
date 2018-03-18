@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable, Optional } from '@angular/core';
+import { Inject, Injectable, InjectionToken, Optional } from '@angular/core';
 
 import { LoggerFactory } from '@bizappframework/ng-logging';
 import { Observable } from 'rxjs/Observable';
@@ -16,6 +16,8 @@ import { INITIAL_CACHE_DATA, InitialCacheData } from './initial-cache-data';
 import { ReturnType } from './return-type';
 import { VERSION } from './version';
 
+export const REMOTE_CACHE_CHECKER_ENDPOINT_URL = new InjectionToken<string>('REMOTE_CACHE_CHECKER_ENDPOINT_URL');
+
 @Injectable()
 export class CacheService {
     private readonly _cacheOptions: CacheOptions;
@@ -29,6 +31,7 @@ export class CacheService {
         @Optional() private readonly _httpClient?: HttpClient,
         @Optional() @Inject(INITIAL_CACHE_DATA) data?: InitialCacheData,
         @Optional() @Inject(CACHE_OPTIONS) options?: CacheOptions,
+        @Optional() @Inject(REMOTE_CACHE_CHECKER_ENDPOINT_URL) remoteCacheCheckerEndpointUrl?: string,
         @Optional() loggerFactory?: LoggerFactory) {
         this._cacheOptions = {
             ...options
@@ -36,18 +39,26 @@ export class CacheService {
         if (this._cacheOptions.remoteCacheCheckInterval) {
             this._remoteCacheCheckInterval = this._cacheOptions.remoteCacheCheckInterval;
         }
-        if (this._cacheOptions.useDefaultRemoteCacheChecker && this._cacheOptions.remoteCacheCheckerEndpointUrl) {
+        if (this._cacheOptions.useDefaultRemoteCacheChecker) {
             if (!this._httpClient) {
                 throw new Error('HttpClient service is not provided.');
             }
 
             const httpClient = this._httpClient;
-            const remoteCacheCheckerEndpointUrl = typeof this._cacheOptions.remoteCacheCheckerEndpointUrl === 'string'
-                ? this._cacheOptions.remoteCacheCheckerEndpointUrl
-                : (<Function>this._cacheOptions.remoteCacheCheckerEndpointUrl)();
+            let checkerEndpointUrl = '';
+            if (this._cacheOptions.remoteCacheCheckerEndpointUrl) {
+                checkerEndpointUrl = typeof this._cacheOptions.remoteCacheCheckerEndpointUrl === 'string'
+                    ? this._cacheOptions.remoteCacheCheckerEndpointUrl
+                    : (<Function>this._cacheOptions.remoteCacheCheckerEndpointUrl)();
+            } else if (remoteCacheCheckerEndpointUrl) {
+                checkerEndpointUrl = remoteCacheCheckerEndpointUrl;
+            }
 
+            if (checkerEndpointUrl) {
+                throw new Error('The remoteCacheCheckerEndpointUrl service is not provided.');
+            }
             this._cacheOptions.remoteCacheChecker = (key: string, hash: string): Observable<CacheCheckResult> => {
-                return httpClient.post<CacheCheckResult>(remoteCacheCheckerEndpointUrl, { key: key, hash: hash });
+                return httpClient.post<CacheCheckResult>(checkerEndpointUrl, { key: key, hash: hash });
             };
         }
 

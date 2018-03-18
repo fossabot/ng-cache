@@ -112,6 +112,12 @@
       "entry": "main.browser.ts",
       "tsconfig": "tsconfig.json",
 
+      "clean": {
+        "beforeRun": {
+          "exclude": [ ".gitkeep" ]
+        }
+      },
+
       "copy": [
         "favicon.ico",
         "generated/ie-polyfills.min.js"
@@ -156,6 +162,7 @@
           "clean": {
             "beforeRun": {
               "cleanOutDir": true,
+              "exclude": [ ".gitkeep" ],
               "paths": [
                 "../ClientApp/.bo-cache/"
               ]

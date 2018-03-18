@@ -292,6 +292,7 @@ pubspec.lock
 
 # build output
 **/dist/
+**/out-tsc/
 **/wwwroot/
-out-tsc/
+!.gitkeep
 **/*.generated.cshtml
