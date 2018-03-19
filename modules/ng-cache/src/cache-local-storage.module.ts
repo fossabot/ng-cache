@@ -5,7 +5,6 @@ import { STORAGE } from './storage';
 
 @NgModule({
     providers: [
-        CacheLocalStorage,
         {
             provide: STORAGE,
             useClass: CacheLocalStorage

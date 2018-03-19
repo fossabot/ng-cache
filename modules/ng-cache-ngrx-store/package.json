@@ -10,7 +10,7 @@
   },
   "peerDependencies": {
     "@angular/core": ">=5.0.0",
-    "@bizappframework/ng-cache": ">=5.0.0-beta.0",
+    "@bizappframework/ng-cache": ">=5.0.0-beta.4",
     "@ngrx/store": ">=5.1.0"
   }
 }

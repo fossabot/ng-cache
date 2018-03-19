@@ -50,12 +50,14 @@ export class CacheService {
                 checkerEndpointUrl = typeof this._cacheOptions.remoteCacheCheckerEndpointUrl === 'string'
                     ? this._cacheOptions.remoteCacheCheckerEndpointUrl
                     : (<Function>this._cacheOptions.remoteCacheCheckerEndpointUrl)();
-            } else if (remoteCacheCheckerEndpointUrl) {
+            }
+
+            if (!checkerEndpointUrl && remoteCacheCheckerEndpointUrl) {
                 checkerEndpointUrl = remoteCacheCheckerEndpointUrl;
             }
 
-            if (checkerEndpointUrl) {
-                throw new Error('The remoteCacheCheckerEndpointUrl service is not provided.');
+            if (!checkerEndpointUrl) {
+                throw new Error('The remoteCacheCheckerEndpointUrl is not provided.');
             }
             this._cacheOptions.remoteCacheChecker = (key: string, hash: string): Observable<CacheCheckResult> => {
                 return httpClient.post<CacheCheckResult>(checkerEndpointUrl, { key: key, hash: hash });

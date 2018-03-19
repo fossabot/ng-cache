@@ -35,9 +35,8 @@ namespace ng_cache_aspnetcore_sample.Controllers
 
                 _cache.Set(UserCacheKeys.UsersCts, cts);
 
-                // For testing only
-                entry.AbsoluteExpiration = DateTimeOffset.UtcNow.AddSeconds(100);
-                // entry.SlidingExpiration = TimeSpan.FromSeconds(15);
+                // For testing short life only
+                entry.AbsoluteExpiration = DateTimeOffset.UtcNow.AddSeconds(90000);
                 entry.ExpirationTokens.Add(cancellationChangeToken);
 
                 var hash = JsonConvert.SerializeObject(items).ToMD5Hash(8);

@@ -2,6 +2,7 @@ version: 5.0.0-beta.{build}
 branches:
   only:
   - master
+skip_non_tags: true
 clone_depth: 1
 image: Visual Studio 2017
 platform: Any CPU
@@ -10,9 +11,13 @@ environment:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   ANGULAR_BUILD_TELEMETRY_OPTOUT: 1
   nodejs_version: "8"
+  npm_auth_token:
+    secure: 2G57TJwGR3m40UD1G7YdkowFzezrhOxEzMKwehKpb1vNPbsbFzfKRIFYVQ7WzZzE
 install:
   - ps: Install-Product node $env:nodejs_version
   - set PATH=%APPDATA%\npm;%PATH%
+  - ps: '"//registry.npmjs.org/:_authToken=$env:npm_auth_token`n" | out-file "$env:userprofile\.npmrc" -Encoding ASCII'
+  - npm whoami
   - npm install
   - npm install -g @bizappframework/angular-build
   - npm link @bizappframework/angular-build
@@ -21,6 +26,13 @@ build_script:
   - npm run build
   - dotnet build samples/ng-cache-aspnetcore-sample/ng-cache-aspnetcore-sample.csproj
 test: off
+deploy_script:
+  - ps: |
+      if ($env:deploy -eq "publish")
+      {
+        iex "npm publish ./dist/packages/ng-cache --access=public"
+        iex "npm publish ./dist/packages/ng-cache-ngrx-store --access=public"
+      }
 cache:
   - node_modules -> package-lock.json
   - '%APPDATA%\npm-cache'

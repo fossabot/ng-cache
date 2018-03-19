@@ -3,7 +3,14 @@ import { HttpClientModule } from '@angular/common/http';
 import { InjectionToken, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { CacheLocalStorageModule, CacheModule, INITIAL_CACHE_DATA, MemoryCacheModule } from '@bizappframework/ng-cache';
+import {
+    CacheLocalStorageModule,
+    CacheModule,
+    INITIAL_CACHE_DATA,
+    MemoryCacheModule,
+    REMOTE_CACHE_CHECKER_ENDPOINT_URL
+} from '@bizappframework/ng-cache';
+
 import { DEFAULT_CACHE_STATE_KEY, NgrxStoreCacheModule } from '@bizappframework/ng-cache-ngrx-store';
 import { ConsoleLoggerModule, LoggerModule } from '@bizappframework/ng-logging';
 
@@ -34,7 +41,7 @@ export const DEFAULT_CACHE_TRANSFER_KEY = 'APP_CACHE';
         CommonModule,
         HttpClientModule,
 
-        // logging
+        // Logging
         LoggerModule.forRoot({ minLevel: 'trace' }),
         ConsoleLoggerModule,
 
@@ -47,13 +54,12 @@ export const DEFAULT_CACHE_TRANSFER_KEY = 'APP_CACHE';
             logOnly: environment.production // Restrict extension to log-only mode
         }),
 
-        // cache
+        // Caching
         CacheModule.forRoot({
-            clearPreviousCache: !environment.production,
+            // clearPreviousCache: !environment.production,
             enableDebug: !environment.production,
             useDefaultRemoteCacheChecker: true,
-            remoteCacheCheckerEndpointUrl: getRemoteCacheCheckerEndpointUrl,
-            remoteCacheCheckInterval: 30000 // for testing only, default is 1 hour
+            remoteCacheCheckInterval: 25000 // for testing short life only, default is 1 hour
         }),
         CacheLocalStorageModule,
         environment.useNgrxStoreCache ? NgrxStoreCacheModule : MemoryCacheModule
@@ -63,6 +69,11 @@ export const DEFAULT_CACHE_TRANSFER_KEY = 'APP_CACHE';
         {
             provide: BASE_URL,
             useFactory: (getOriginUrl)
+        },
+        {
+            provide: REMOTE_CACHE_CHECKER_ENDPOINT_URL,
+            useFactory: (getRemoteCacheCheckerEndpointUrl),
+            deps: [BASE_URL]
         },
         {
             provide: CACHE_TRANSFER_KEY,
@@ -81,8 +92,8 @@ export function getOriginUrl(): string {
     return window.location.origin;
 }
 
-export function getRemoteCacheCheckerEndpointUrl(): string {
-    return `${getOriginUrl()}/api/cache/check`;
+export function getRemoteCacheCheckerEndpointUrl(baseUrl: string): string {
+    return `${baseUrl}/api/cache/check`;
 }
 
 export function getTransferData(cacheKey: string): any {

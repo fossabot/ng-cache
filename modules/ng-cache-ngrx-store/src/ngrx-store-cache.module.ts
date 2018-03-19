@@ -15,7 +15,6 @@ import { DEFAULT_CACHE_STATE_KEY, NgrxStoreCache } from './ngrx-store-cache';
         EffectsModule.forFeature([CacheEffects])
     ],
     providers: [
-        NgrxStoreCache,
         {
             provide: CACHE,
             useClass: NgrxStoreCache

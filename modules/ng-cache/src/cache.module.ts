@@ -9,6 +9,12 @@ import { CacheService } from './cache.service';
     ]
 })
 export class CacheModule {
+    constructor(@Optional() @SkipSelf() parentModule: CacheModule) {
+        if (parentModule) {
+            throw new Error('CacheModule has already been loaded, import in root module only.');
+        }
+    }
+
     static forRoot(options: CacheOptions): ModuleWithProviders {
         return {
             ngModule: CacheModule,
@@ -19,11 +25,5 @@ export class CacheModule {
                 }
             ]
         };
-    }
-
-    constructor(@Optional() @SkipSelf() parentModule: CacheModule) {
-        if (parentModule) {
-            throw new Error('CacheModule has already been loaded, import in root module only.');
-        }
     }
 }

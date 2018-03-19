@@ -5,7 +5,6 @@ import { MemoryCache } from './memory-cache';
 
 @NgModule({
     providers: [
-        MemoryCache,
         {
             provide: CACHE,
             useClass: MemoryCache
