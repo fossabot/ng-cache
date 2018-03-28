@@ -1,5 +1,5 @@
 <h1>Cache Demo</h1>
-<button type="button" (click)="clearCache">Clear Cache</button>
+<button type="button" (click)="clearCache()">Clear Cache</button>
 <ul>
     <li *ngFor="let user of users | async">
         {{user}}

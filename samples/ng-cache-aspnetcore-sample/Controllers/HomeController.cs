@@ -10,7 +10,7 @@ namespace ng_cache_aspnetcore_sample.Controllers
         public IActionResult Index()
         {
             var transferCacheData = new { Greeting = "From ASP.Net Core"};
-            ViewData["TransferData"] = CreateStateTransferScript("APP_CACHE", transferCacheData);
+            ViewData["TransferData"] = CreateStateTransferScript("appCache", transferCacheData);
 
             return View();
         }

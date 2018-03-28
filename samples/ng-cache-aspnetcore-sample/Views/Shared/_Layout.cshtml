@@ -11,15 +11,12 @@
     @Html.Partial("_BaseHref.generated")
     @Html.Partial("_Favicons.generated")
     @Html.Partial("_ResourceHints.generated")
-    @*@Html.Partial("_ApplicationInsightsSnippet")*@
-
     @Html.Partial("_Styles.generated")
     @Html.Partial("_PolyfillsSnippet")
     @Html.Partial("_Runtime.generated")
 </head>
 <body>
     @RenderBody()
-    @Html.Raw(ViewData["TransferData"])
     @{await Html.RenderPartialAsync("_Scripts.generated"); }
     @RenderSection("Scripts", required: false)
     @{await Html.RenderPartialAsync("_NoScript"); }

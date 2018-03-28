@@ -11,7 +11,11 @@ import {
     REMOTE_CACHE_CHECKER_ENDPOINT_URL
 } from '@bizappframework/ng-cache';
 
-import { DEFAULT_CACHE_STATE_KEY, NgrxStoreCacheModule } from '@bizappframework/ng-cache-ngrx-store';
+import {
+    CacheEffects,
+    cacheReducer,
+    NgrxStoreCacheModule
+} from '@bizappframework/ng-cache-ngrx-store';
 import { ConsoleLoggerModule, LoggerModule } from '@bizappframework/ng-logging';
 
 import { EffectsModule } from '@ngrx/effects';
@@ -29,7 +33,6 @@ import { metaReducers, reducers } from './reducers';
 export const appId = 'ng-cache';
 
 export const CACHE_TRANSFER_KEY = new InjectionToken<string>('CACHE_TRANSFER_KEY');
-export const DEFAULT_CACHE_TRANSFER_KEY = 'APP_CACHE';
 
 @NgModule({
     bootstrap: [AppComponent],
@@ -48,27 +51,27 @@ export const DEFAULT_CACHE_TRANSFER_KEY = 'APP_CACHE';
         // ngrx
         StoreModule.forRoot(reducers, { metaReducers }),
         EffectsModule.forRoot([]),
-        // Instrumentation must be imported after importing StoreModule (config is optional)
         StoreDevtoolsModule.instrument({
-            // maxAge: 25, // Retains last 25 states
-            logOnly: environment.production // Restrict extension to log-only mode
+            logOnly: environment.production
         }),
 
         // Caching
         CacheModule.forRoot({
             // clearPreviousCache: !environment.production,
-            enableDebug: !environment.production,
+            enableDebug: !true,
             useDefaultRemoteCacheChecker: true,
             remoteCacheCheckInterval: 25000 // for testing short life only, default is 1 hour
         }),
         CacheLocalStorageModule,
-        environment.useNgrxStoreCache ? NgrxStoreCacheModule : MemoryCacheModule
+        environment.useNgrxStoreCache ? NgrxStoreCacheModule : MemoryCacheModule,
+        environment.useNgrxStoreCache ? StoreModule.forFeature('cache', cacheReducer) : [],
+        environment.useNgrxStoreCache ? EffectsModule.forFeature([CacheEffects]) : []
     ],
     providers: [
         UserService,
         {
             provide: BASE_URL,
-            useFactory: (getOriginUrl)
+            useFactory: (getBaseUrl)
         },
         {
             provide: REMOTE_CACHE_CHECKER_ENDPOINT_URL,
@@ -77,7 +80,7 @@ export const DEFAULT_CACHE_TRANSFER_KEY = 'APP_CACHE';
         },
         {
             provide: CACHE_TRANSFER_KEY,
-            useValue: DEFAULT_CACHE_STATE_KEY
+            useValue: 'appCache'
         },
         {
             provide: INITIAL_CACHE_DATA,
@@ -88,12 +91,12 @@ export const DEFAULT_CACHE_TRANSFER_KEY = 'APP_CACHE';
 })
 export class AppModule { }
 
-export function getOriginUrl(): string {
-    return window.location.origin;
+export function getBaseUrl(): string {
+    return document.getElementsByTagName('base')[0].href;
 }
 
 export function getRemoteCacheCheckerEndpointUrl(baseUrl: string): string {
-    return `${baseUrl}/api/cache/check`;
+    return `${baseUrl}api/cache/check`;
 }
 
 export function getTransferData(cacheKey: string): any {

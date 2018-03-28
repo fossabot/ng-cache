@@ -24,7 +24,7 @@ export class UserService {
     getUsers(): Observable<string[]> {
         return this._cacheService.getOrSet(UserCacheKeys.Users,
             (entryOptions: CacheEntryOptions) => {
-                const endpointUrl = `${this._baseUrl}/api/users`;
+                const endpointUrl = `${this._baseUrl}api/users`;
 
                 return this._httpClient.get(endpointUrl, { observe: 'response' }).pipe(map(
                     (response: HttpResponse<string[]>) => {

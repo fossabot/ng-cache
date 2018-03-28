@@ -130,7 +130,7 @@
       ],
 
       "publicPath": "/",
-      "baseHref": "~/",
+      "baseHref": "/",
       "htmlInject": {
         "resourceHints": true,
         "baseHrefOut": "../Views/Shared/_BaseHref.generated.cshtml",
