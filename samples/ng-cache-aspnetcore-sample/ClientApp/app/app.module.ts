@@ -11,24 +11,18 @@ import {
     REMOTE_CACHE_CHECKER_ENDPOINT_URL
 } from '@bizappframework/ng-cache';
 
-import {
-    CacheEffects,
-    cacheReducer,
-    NgrxStoreCacheModule
-} from '@bizappframework/ng-cache-ngrx-store';
-import { ConsoleLoggerModule, LoggerModule } from '@bizappframework/ng-logging';
-
-import { EffectsModule } from '@ngrx/effects';
-import { StoreModule } from '@ngrx/store';
-import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-
-import { environment } from 'environments/environment';
+// import {
+//     CacheEffects,
+//     cacheReducer,
+//     NgrxStoreCacheModule
+// } from '@bizappframework/ng-cache-ngrx-store';
+// import { ConsoleLoggerModule, LoggerModule } from '@bizappframework/ng-logging';
 
 import { BASE_URL } from 'app/shared/tokens';
 import { UserService } from 'app/shared/user.service';
 
 import { AppComponent } from './app.component';
-import { metaReducers, reducers } from './reducers';
+// import { metaReducers, reducers } from './reducers';
 
 export const appId = 'ng-cache';
 
@@ -45,15 +39,8 @@ export const CACHE_TRANSFER_KEY = new InjectionToken<string>('CACHE_TRANSFER_KEY
         HttpClientModule,
 
         // Logging
-        LoggerModule.forRoot({ minLevel: 'trace' }),
-        ConsoleLoggerModule,
-
-        // ngrx
-        StoreModule.forRoot(reducers, { metaReducers }),
-        EffectsModule.forRoot([]),
-        StoreDevtoolsModule.instrument({
-            logOnly: environment.production
-        }),
+        // LoggerModule.forRoot({ minLevel: 'trace' }),
+        // ConsoleLoggerModule,
 
         // Caching
         CacheModule.forRoot({
@@ -63,9 +50,7 @@ export const CACHE_TRANSFER_KEY = new InjectionToken<string>('CACHE_TRANSFER_KEY
             remoteCacheCheckInterval: 25000 // for testing short life only, default is 1 hour
         }),
         CacheLocalStorageModule,
-        environment.useNgrxStoreCache ? NgrxStoreCacheModule : MemoryCacheModule,
-        environment.useNgrxStoreCache ? StoreModule.forFeature('cache', cacheReducer) : [],
-        environment.useNgrxStoreCache ? EffectsModule.forFeature([CacheEffects]) : []
+        MemoryCacheModule
     ],
     providers: [
         UserService,

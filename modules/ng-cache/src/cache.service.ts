@@ -1,10 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, InjectionToken, Optional } from '@angular/core';
 
-import { LoggerFactory } from '@bizappframework/ng-logging';
-import { Observable } from 'rxjs/Observable';
-import { fromPromise } from 'rxjs/observable/fromPromise';
-import { of } from 'rxjs/observable/of';
+import { from, Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
 import { Cache, CACHE } from './cache';
@@ -32,7 +29,7 @@ export class CacheService {
         @Optional() @Inject(INITIAL_CACHE_DATA) data?: InitialCacheData,
         @Optional() @Inject(CACHE_OPTIONS) options?: CacheOptions,
         @Optional() @Inject(REMOTE_CACHE_CHECKER_ENDPOINT_URL) remoteCacheCheckerEndpointUrl?: string,
-        @Optional() loggerFactory?: LoggerFactory) {
+        @Optional() @Inject('LOGGER_FACTORY') loggerFactory?: any) {
         this._cacheOptions = {
             ...options
         };
@@ -253,7 +250,7 @@ export class CacheService {
                             if (retValue$ instanceof Observable) {
                                 return retValue$;
                             } else if (retValue$ instanceof Promise) {
-                                return fromPromise(retValue$);
+                                return from(retValue$);
                             } else {
                                 return of(retValue$);
                             }

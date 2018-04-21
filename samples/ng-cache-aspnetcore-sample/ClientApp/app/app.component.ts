@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { CacheService } from '@bizappframework/ng-cache';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 import { UserService } from 'app/shared/user.service';
 

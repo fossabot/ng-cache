@@ -1,14 +1,14 @@
 {
-  "$schema": "./node_modules/@bizappframework/angular-build/schemas/schema-draft-04.json#",
+  "$schema": "./node_modules/@bizappframework/angular-build/schemas/schema.json#",
   "libs": [
     {
       "name": "ng-cache",
-      "srcDir": "modules/ng-cache",
-      "outDir": "dist/packages/ng-cache",
+      "root": "modules/ng-cache",
+      "outputPath": "dist/packages/ng-cache",
       "libraryName": "baf.ngCache",
 
       "tsTranspilation": {
-        "tsconfig": "tsconfig-build.json",
+        "tsConfig": "tsconfig-build.json",
         "copyTemplateAndStyleUrls": false,
         "inlineMetaDataResources": false
       },
@@ -24,7 +24,7 @@
       "envOverrides": {
         "prod": {
           "clean": {
-            "beforeRun": {
+            "beforeBuild": {
               "cleanOutDir": true
             }
           },
@@ -38,20 +38,19 @@
               "entry": "index.js",
               "entryRoot": "tsOutDir",
               "libraryTarget": "es",
-              "outDir": "bundles"
+              "outputFilePath": "bundles/"
             },
             {
               "entryRoot": "prevBundleOutDir",
               "libraryTarget": "es",
-              "outDir": "bundles",
+              "outputFilePath": "bundles/",
               "transformScriptTargetOnly": true,
               "scriptTarget": "es5"
             },
             {
               "entryRoot": "prevBundleOutDir",
               "libraryTarget": "umd",
-              "outDir": "bundles",
-              "namedExports": true
+              "outputFilePath": "bundles/"
             }
           ],
           "packageOptions": {
@@ -62,11 +61,12 @@
       }
     },
     {
-      "extends": "ng-cache",
+      "extends": "projects:ng-cache",
       "name": "ng-cache-ngrx-store",
-      "srcDir": "modules/ng-cache-ngrx-store",
-      "outDir": "dist/packages/ng-cache-ngrx-store",
+      "root": "modules/ng-cache-ngrx-store",
+      "outputPath": "dist/packages/ng-cache-ngrx-store",
       "libraryName": "baf.ngCacheNgrxStore",
+
       "externals": {
         "@bizappframework/ng-cache": "baf.ngCache",
         "@bizappframework/ng-logging": "baf.ngLogging",
@@ -79,11 +79,11 @@
     {
       "name": "generate",
       "platformTarget": "web",
-      "srcDir": "samples/ng-cache-aspnetcore-sample/ClientApp",
-      "outDir": "samples/ng-cache-aspnetcore-sample/ClientApp/generated",
+      "root": "samples/ng-cache-aspnetcore-sample/ClientApp",
+      "outputPath": "samples/ng-cache-aspnetcore-sample/ClientApp/generated",
 
       "clean": {
-        "beforeRun": {
+        "beforeBuild": {
           "cleanOutDir": true
         }
       },
@@ -93,7 +93,10 @@
       ],
       "polyfillsChunkName": "ie-polyfills.min",
 
-      "bundlesHash": false,
+      "outputHashing": {
+        "bundles": false
+      },
+
       "publicPath": "/",
       "skip": true,
 
@@ -106,14 +109,14 @@
     {
       "name": "browser-app",
       "platformTarget": "web",
-      "srcDir": "samples/ng-cache-aspnetcore-sample/ClientApp",
-      "outDir": "samples/ng-cache-aspnetcore-sample/wwwroot",
+      "root": "samples/ng-cache-aspnetcore-sample/ClientApp",
+      "outputPath": "samples/ng-cache-aspnetcore-sample/wwwroot",
 
       "entry": "main.browser.ts",
-      "tsconfig": "tsconfig.json",
+      "tsConfig": "tsconfig.json",
 
       "clean": {
-        "beforeRun": {
+        "beforeBuild": {
           "exclude": [ ".gitkeep" ]
         }
       },
@@ -149,39 +152,34 @@
           "bundleAnalyzer": {
             "openAnalyzer": true
           },
-          // "stats": {
-          //   "modules": true,
-          //   "chunks": true,
-          //   "chunkModules": true,
-          //   "entrypoints": true,
-          //   "excludeModules": "node_modules"
-          // },
           "concatenateModules": false
         },
         "prod": {
           "clean": {
-            "beforeRun": {
+            "beforeBuild": {
               "cleanOutDir": true,
               "exclude": [ ".gitkeep" ],
               "paths": [
                 "../ClientApp/.bo-cache/"
               ]
             },
-            "allowOutsideOutputDir": true
+            "allowOutsideOutDir": true
           },
 
-          "bundlesHash": false,
-          "chunksHash": false,
+          "outputHashing":{
+            "bundles": false,
+            "chunks": false
+          },
 
-          "moduleReplacements": [
+          "fileReplacements": [
             {
-              "resourcePath": "./environments/environment.ts",
-              "newResourcePath": "./environments/environment.prod.ts"
+              "src": "./environments/environment.ts",
+              "replaceWith": "./environments/environment.prod.ts"
             }
           ]
         },
         "aot": {
-          "tsconfig": "tsconfig.aot.json",
+          "tsConfig": "tsconfig.aot.json",
 
           "polyfills": [
             "polyfills.ts"
@@ -190,5 +188,4 @@
       }
     }
   ]
-  //"logLevel": "debug"
 }

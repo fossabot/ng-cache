@@ -2,7 +2,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 
 import { CacheEntryOptions, CacheService, handleCacheResponse } from '@bizappframework/ng-cache';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { BASE_URL } from './tokens';

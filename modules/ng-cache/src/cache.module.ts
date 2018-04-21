@@ -1,4 +1,4 @@
-import { ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
+import { ModuleWithProviders, NgModule } from '@angular/core';
 
 import { CACHE_OPTIONS, CacheOptions } from './cache-options';
 import { CacheService } from './cache.service';
@@ -9,12 +9,6 @@ import { CacheService } from './cache.service';
     ]
 })
 export class CacheModule {
-    constructor(@Optional() @SkipSelf() parentModule: CacheModule) {
-        if (parentModule) {
-            throw new Error('CacheModule has already been loaded, import in root module only.');
-        }
-    }
-
     static forRoot(options: CacheOptions): ModuleWithProviders {
         return {
             ngModule: CacheModule,

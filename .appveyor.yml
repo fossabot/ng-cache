@@ -1,4 +1,3 @@
-version: 5.0.0-beta.{build}
 branches:
   only:
   - master
@@ -19,8 +18,6 @@ install:
   - ps: '"//registry.npmjs.org/:_authToken=$env:npm_auth_token`n" | out-file "$env:userprofile\.npmrc" -Encoding ASCII'
   - npm whoami
   - npm install
-  - npm install -g @bizappframework/angular-build
-  - npm link @bizappframework/angular-build
   - ngb --version
 build_script:
   - npm run build

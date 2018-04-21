@@ -3,7 +3,7 @@ import { Inject, Injectable, Optional } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
 import { CacheItem, Storage, STORAGE } from '@bizappframework/ng-cache';
