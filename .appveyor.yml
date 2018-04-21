@@ -18,7 +18,6 @@ install:
   - ps: '"//registry.npmjs.org/:_authToken=$env:npm_auth_token`n" | out-file "$env:userprofile\.npmrc" -Encoding ASCII'
   - npm whoami
   - npm install
-  - ngb --version
 build_script:
   - npm run build
   - dotnet build samples/ng-cache-aspnetcore-sample/ng-cache-aspnetcore-sample.csproj
