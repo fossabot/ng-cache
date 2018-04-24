@@ -1,6 +1,6 @@
 {
   "name": "@bizappframework/ng-cache",
-  "version": "6.0.0-beta.0",
+  "version": "6.0.0-beta.1",
   "description": "Cache services for Angular app.",
   "author": "BizAppFramework Team",
   "license": "MIT",
@@ -18,7 +18,7 @@
     "@angular/core": "^6.0.0-rc.5",
     "@angular/platform-browser": "^6.0.0-rc.5",
     "@angular/platform-browser-dynamic": "^6.0.0-rc.5",
-    "@bizappframework/angular-build": "^6.0.0-rc.3",
+    "@bizappframework/angular-build": "^6.0.0-rc.5",
     "@ngrx/effects": "^6.0.0-beta.1",
     "@ngrx/store": "^6.0.0-beta.1",
     "@ngrx/store-devtools": "^6.0.0-beta.1",
