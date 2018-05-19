@@ -22,4 +22,7 @@ Contains ngrx-store wrapper for @bizappframework/ng-cache.
 
 ## License
 
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](/LICENSE)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](/LICENSE)[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmmzliveid%2Fng-cache.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmmzliveid%2Fng-cache?ref=badge_shield)
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmmzliveid%2Fng-cache.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmmzliveid%2Fng-cache?ref=badge_large)
